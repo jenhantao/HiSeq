@@ -1,0 +1,25 @@
+python parse_seq.py A.pep > A.proc
+python parse_seq.py B.pep > B.proc
+python parse_seq.py C.pep > C.proc
+python parse_seq.py D.pep > D.proc
+python parse_seq.py E.pep > E.proc
+python parse_seq.py F.pep > F.proc
+python parse_seq.py G.pep > G.proc
+python parse_seq.py H.pep > H.proc
+python parse_seq.py I.pep > I.proc
+python parse_seq.py J.pep > J.proc
+python parse_seq.py K.pep > K.proc
+python parse_seq.py L.pep > L.proc
+python parse_seq.py M.pep > M.proc
+python parse_seq.py N.pep > N.proc
+python parse_seq.py O.pep > O.proc
+python parse_seq.py P.pep > P.proc
+python parse_seq.py Q.pep > Q.proc
+python parse_seq.py R.pep > R.proc
+python parse_seq.py S.pep > S.proc
+python parse_seq.py T.pep > T.proc
+python parse_seq.py U.pep > U.proc
+python parse_seq.py V.pep > V.proc
+python parse_seq.py W.pep > W.proc
+python parse_seq.py X.pep > X.proc
+

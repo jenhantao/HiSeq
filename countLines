@@ -1,0 +1,25 @@
+wc -l A_R1.fastq
+wc -l B_R1.fastq
+wc -l C_R1.fastq
+wc -l D_R1.fastq
+wc -l E_R1.fastq
+wc -l F_R1.fastq
+wc -l G_R1.fastq
+wc -l H_R1.fastq
+wc -l I_R1.fastq
+wc -l J_R1.fastq
+wc -l K_R1.fastq
+wc -l L_R1.fastq
+wc -l M_R1.fastq
+wc -l N_R1.fastq
+wc -l O_R1.fastq
+wc -l P_R1.fastq
+wc -l Q_R1.fastq
+wc -l R_R1.fastq
+wc -l S_R1.fastq
+wc -l T_R1.fastq
+wc -l U_R1.fastq
+wc -l V_R1.fastq
+wc -l W_R1.fastq
+wc -l X_R1.fastq
+

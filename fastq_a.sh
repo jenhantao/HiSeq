@@ -1,0 +1,25 @@
+fastq_to_fasta -Q 33 -i A_R1.fastq -o A.fasta -r
+fastq_to_fasta -Q 33 -i B_R1.fastq -o B.fasta -r
+fastq_to_fasta -Q 33 -i C_R1.fastq -o C.fasta -r
+fastq_to_fasta -Q 33 -i D_R1.fastq -o D.fasta -r
+fastq_to_fasta -Q 33 -i E_R1.fastq -o E.fasta -r
+fastq_to_fasta -Q 33 -i F_R1.fastq -o F.fasta -r
+fastq_to_fasta -Q 33 -i G_R1.fastq -o G.fasta -r
+fastq_to_fasta -Q 33 -i H_R1.fastq -o H.fasta -r
+fastq_to_fasta -Q 33 -i I_R1.fastq -o I.fasta -r
+fastq_to_fasta -Q 33 -i J_R1.fastq -o J.fasta -r
+fastq_to_fasta -Q 33 -i K_R1.fastq -o K.fasta -r
+fastq_to_fasta -Q 33 -i L_R1.fastq -o L.fasta -r
+fastq_to_fasta -Q 33 -i M_R1.fastq -o M.fasta -r
+fastq_to_fasta -Q 33 -i N_R1.fastq -o N.fasta -r
+fastq_to_fasta -Q 33 -i O_R1.fastq -o O.fasta -r
+fastq_to_fasta -Q 33 -i P_R1.fastq -o P.fasta -r
+fastq_to_fasta -Q 33 -i Q_R1.fastq -o Q.fasta -r
+fastq_to_fasta -Q 33 -i R_R1.fastq -o R.fasta -r
+fastq_to_fasta -Q 33 -i S_R1.fastq -o S.fasta -r
+fastq_to_fasta -Q 33 -i T_R1.fastq -o T.fasta -r
+fastq_to_fasta -Q 33 -i U_R1.fastq -o U.fasta -r
+fastq_to_fasta -Q 33 -i V_R1.fastq -o V.fasta -r
+fastq_to_fasta -Q 33 -i W_R1.fastq -o W.fasta -r
+fastq_to_fasta -Q 33 -i X_R1.fastq -o X.fasta -r
+

@@ -1,0 +1,29 @@
+awk '{ if ($5 >= 5 && $1 ~ /A/) print }' all_pools.enrichmentvals > filtered_enrichvals/A_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /B/) print }' all_pools.enrichmentvals > filtered_enrichvals/B_filtered.vals
+
+awk '{ if ($5 >= 5 && $1 ~ /C/) print }' all_pools.enrichmentvals > filtered_enrichvals/C_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /D/) print }' all_pools.enrichmentvals > filtered_enrichvals/D_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /E/) print }' all_pools.enrichmentvals > filtered_enrichvals/E_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /F/) print }' all_pools.enrichmentvals > filtered_enrichvals/F_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /G/) print }' all_pools.enrichmentvals > filtered_enrichvals/G_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /H/) print }' all_pools.enrichmentvals > filtered_enrichvals/H_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /I/) print }' all_pools.enrichmentvals > filtered_enrichvals/I_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /J/) print }' all_pools.enrichmentvals > filtered_enrichvals/J_filtered.vals
+
+awk '{ if ($5 >= 5 && $1 ~ /K/) print }' all_pools.enrichmentvals > filtered_enrichvals/K_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /L/) print }' all_pools.enrichmentvals > filtered_enrichvals/L_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /M/) print }' all_pools.enrichmentvals > filtered_enrichvals/M_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /N/) print }' all_pools.enrichmentvals > filtered_enrichvals/N_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /O/) print }' all_pools.enrichmentvals > filtered_enrichvals/O_filtered.vals
+
+awk '{ if ($5 >= 5 && $1 ~ /P/) print }' all_pools.enrichmentvals > filtered_enrichvals/P_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /Q/) print }' all_pools.enrichmentvals > filtered_enrichvals/Q_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /R/) print }' all_pools.enrichmentvals > filtered_enrichvals/R_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /S/) print }' all_pools.enrichmentvals > filtered_enrichvals/S_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /T/) print }' all_pools.enrichmentvals > filtered_enrichvals/T_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /U/) print }' all_pools.enrichmentvals > filtered_enrichvals/U_filtered.vals
+
+awk '{ if ($5 >= 5 && $1 ~ /V/) print }' all_pools.enrichmentvals > filtered_enrichvals/V_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /W/) print }' all_pools.enrichmentvals > filtered_enrichvals/W_filtered.vals
+awk '{ if ($5 >= 5 && $1 ~ /Y/) print }' all_pools.enrichmentvals > filtered_enrichvals/Y_filtered.vals
+

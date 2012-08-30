@@ -1,0 +1,25 @@
+python histoBinning.py A.proc > A.his
+python histoBinning.py B.proc > B.his
+python histoBinning.py C.proc > C.his
+python histoBinning.py D.proc > D.his
+python histoBinning.py E.proc > E.his
+python histoBinning.py F.proc > F.his
+python histoBinning.py G.proc > G.his
+python histoBinning.py H.proc > H.his
+python histoBinning.py I.proc > I.his
+python histoBinning.py J.proc > J.his
+python histoBinning.py K.proc > K.his
+python histoBinning.py L.proc > L.his
+python histoBinning.py M.proc > M.his
+python histoBinning.py N.proc > N.his
+python histoBinning.py O.proc > O.his
+python histoBinning.py P.proc > P.his
+python histoBinning.py Q.proc > Q.his
+python histoBinning.py R.proc > R.his
+python histoBinning.py S.proc > S.his
+python histoBinning.py T.proc > T.his
+python histoBinning.py U.proc > U.his
+python histoBinning.py V.proc > V.his
+python histoBinning.py W.proc > W.his
+python histoBinning.py X.proc > X.his
+
