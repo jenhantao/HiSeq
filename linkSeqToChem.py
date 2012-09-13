@@ -18,16 +18,20 @@ for line in configFile:
           if len(currentPool)>0:
                _chemDict[currentPool] = set(currentChemicals);
           currentChemicals = list();
-          currentPool = line.split(" ")[1].strip("\n")
+          currentPool = line.split(" ")[1].strip("\n").upper() #all pools are upper case
           #print "current pool is: " + currentPool
      elif not line.startswith("#") and len(line) > 1:
-          #print "adding chemical: "+line.rstrip("\n");          
-          currentChemicals.append(line.rstrip("\n"))
-          tempChemList.append(line.rstrip("\n"))
-del _chemDict["Enrichment"] #Enrichment is a variable, not a pool
+          #print "adding chemical: "+line.rstrip("\n");
+          currentChem=line.rstrip("\n").rstrip().lower().replace(" ","_") #chemicals are lower case, and have no spaces
+          currentChemicals.append(currentChem)
+          tempChemList.append(currentChem)
+del _chemDict["ENRICHMENT"] #Enrichment is a variable, not a pool
+del _chemDict["CONFOUNDING"] #Confounding is a variable, not a pool
+
 _chemDict[currentPool] = set(currentChemicals); #add the last entry
 _chemList = set(tempChemList) #list of unique chemicals needed for initialzing entries in _chemHash
 enrichmentThreshold = float(configFile[0].split(" ")[3]) #ratio required between new pool and original to be considered enriched
+confoundingThreshold = float(configFile[1].split(" ")[3]) #difference between chemical and _notchemical to be considered nonconfounding
 
 
 #initialize chemHash
@@ -38,6 +42,8 @@ _chemHash = dict();
 
 # this function will initialize the entry for a sequence in 
 def addSeqEntry(sequence,chemical):
+     sequence = sequence.upper() # all sequences are upper case
+     chemical = chemical.lower() # all chemicals are lower case
      if sequence in _chemHash:
           # if key already exists, update it
           _chemHash[sequence][chemical] = _chemHash[sequence][chemical]+1
@@ -64,10 +70,8 @@ with open("./data/"+poolKeys[-1]+".his") as f:
 for line in hisFile:
      if len(line)>0:
           tokens = line.rstrip("\n").split("\t")
-          #print "seq: "+tokens[0]+" count: "+tokens[1]
           prephageHistValues[tokens[0]]=tokens[1]
 for i in range(len(poolKeys)-1):
-     #print "reading in: "+poolKeys[i]
      with open("./data/"+poolKeys[i]+".his") as f:
           hisFile = f.readlines()
      currentRatioDict = dict()
@@ -77,23 +81,41 @@ for i in range(len(poolKeys)-1):
                ratio = float(tokens[1])/float(prephageHistValues[tokens[0]])
                if ratio >= enrichmentThreshold:
                     currentRatioDict[tokens[0]] = ratio
-                    #print tokens[0]+"|"+str(currentRatioDict[tokens[0]])
      _ratioHash[poolKeys[i]]=currentRatioDict
 
 # produce the data set that we're interested in, list of sequences and the chemicals that enrich them
 for key in _ratioHash:
-     print key
-     
+     positiveChemicals = set(_chemDict[key]) #chemicals that actually exist
+     negativeChemicals = [] #chemicals that don't exist
+     temp = set(_chemList)-positiveChemicals
+     for chem in temp:
+          negativeChemicals.append("not_"+chem)
+     positiveChemicals = sorted(positiveChemicals)
+     negativeChemicals = sorted(negativeChemicals)
+     print "current pool: " + key
+     for sequence in _ratioHash[key]:
+          for posChem in positiveChemicals:
+               # increment the positive entries
+               addSeqEntry(sequence, posChem)
+          for negChem in negativeChemicals:
+               # increment the negative entries
+               addSeqEntry(sequence, negChem)
+
+# eliminate confounding chemicals and remove them from dictionary
+for sequence in _chemHash.keys():
+     for chemical in _chemList:
+          if _chemHash[sequence][chemical]-_chemHash[sequence]["not_"+chemical]<_chemHash[sequence][chemical]-confoundingThreshold:
+               print "moo"
+          
      
      
 
 #testArea
 addSeqEntry("moo","Urea")
-addSeqEntry("cow","Urea")
+addSeqEntry("cow","urea")
 addSeqEntry("moo","Urea")
 
 
-print(_chemHash["cow"]["Urea"])
 
 
 
