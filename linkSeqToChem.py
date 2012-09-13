@@ -92,7 +92,6 @@ for key in _ratioHash:
           negativeChemicals.append("not_"+chem)
      positiveChemicals = sorted(positiveChemicals)
      negativeChemicals = sorted(negativeChemicals)
-     print "current pool: " + key
      for sequence in _ratioHash[key]:
           for posChem in positiveChemicals:
                # increment the positive entries
@@ -104,9 +103,21 @@ for key in _ratioHash:
 # eliminate confounding chemicals and remove them from dictionary
 for sequence in _chemHash.keys():
      for chemical in _chemList:
-          if _chemHash[sequence][chemical]-_chemHash[sequence]["not_"+chemical]<_chemHash[sequence][chemical]-confoundingThreshold:
-               print "moo"
-          
+          if not _chemHash[sequence][chemical]-_chemHash[sequence]["not_"+chemical] >= _chemHash[sequence][chemical]-confoundingThreshold:
+               del _chemHash[sequence][chemical]
+               del _chemHash[sequence]["not_"+chemical]
+          else:
+               del _chemHash[sequence]["not_"+chemical] #not_chemical is not confounding or enriching, so delete it
+# remove empty entries
+for sequence in _chemHash.keys():
+     if not len(_chemHash[sequence]) > 0:
+          del _chemHash[sequence]
+# print out results
+for sequence in _chemHash.keys():
+      print "----------------------------------------"
+      print sequence + " is enriched by:"
+      for chemical in _chemHash[sequence]:
+           print chemical +" "+str(_chemHash[sequence][chemical])
      
      
 
