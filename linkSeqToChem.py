@@ -19,9 +19,7 @@ for line in configFile:
                _chemDict[currentPool] = set(currentChemicals);
           currentChemicals = list();
           currentPool = line.split(" ")[1].strip("\n").upper() #all pools are upper case
-          #print "current pool is: " + currentPool
      elif not line.startswith("#") and len(line) > 1:
-          #print "adding chemical: "+line.rstrip("\n");
           currentChem=line.rstrip("\n").rstrip().lower().replace(" ","_") #chemicals are lower case, and have no spaces
           currentChemicals.append(currentChem)
           tempChemList.append(currentChem)
@@ -118,13 +116,6 @@ for sequence in _chemHash.keys():
       print sequence + " is enriched by:"
       for chemical in _chemHash[sequence]:
            print chemical +" "+str(_chemHash[sequence][chemical])
-     
-     
-
-#testArea
-addSeqEntry("moo","Urea")
-addSeqEntry("cow","urea")
-addSeqEntry("moo","Urea")
 
 
 
@@ -133,29 +124,3 @@ addSeqEntry("moo","Urea")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     
-
-
-
-files = [];
-for fname in dirList:
-     files.append(fname)
-#for fileName in files:
-     #print(fileName)

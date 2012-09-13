@@ -107,7 +107,7 @@ for sequence in _chemHash.keys():
                del _chemHash[sequence][chemical]
                del _chemHash[sequence]["not_"+chemical]
           else:
-               del _chemHash["not_"+chemical] #not_chemical is not confounding or enriching, so delete it
+               del _chemHash[sequence]["not_"+chemical] #not_chemical is not confounding or enriching, so delete it
 # remove empty entries
 for sequence in _chemHash.keys():
      if not len(_chemHash[sequence]) > 0:
@@ -132,30 +132,3 @@ addSeqEntry("moo","Urea")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     
-
-
-
-files = [];
-for fname in dirList:
-     files.append(fname)
-#for fileName in files:
-     #print(fileName)
