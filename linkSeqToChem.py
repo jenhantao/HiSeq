@@ -112,11 +112,10 @@ for sequence in _chemHash.keys():
           del _chemHash[sequence]
 # print out results
 for sequence in _chemHash.keys():
-      print "----------------------------------------"
-      print sequence + " is enriched by:"
-      for chemical in _chemHash[sequence]:
-           print chemical +" "+str(_chemHash[sequence][chemical])
-
+     string = sequence 
+     for chemical in _chemHash[sequence]:
+          string = string+","+ chemical +" "+str(_chemHash[sequence][chemical])
+     print string     
 
 
 
