@@ -1,6 +1,16 @@
 #!/usr/bin/python
+# first argument is enrichment ratio threshold
+# second argument is confounding threshold
+# third argument is path to data
+# fourth argument is the number of times a chemical has to enrich a sequence
+# ie, how many different pools has a chemmical that enriches a sequence
 import os
 path="./data"  # insert the path to the directory of interest here
+
+enrichmentThreshold = float(sys.argv[0]) #ratio required between new pool and original to be considered enriched
+confoundingThreshold = float(sys.argv[1]) #difference between chemical and _notchemical to be considered nonconfounding
+path = sys.argv[2]
+poolThreshold = sys.argv[3]
 
 # I want to process the .his values which are just raw counts of every sequence that appears
 # I want to process the .val files which are derviced from the .proc files
@@ -10,7 +20,8 @@ dirList=os.listdir(path)
 #read in configuration file and store each unique chemical
 with open("./data/chempools.config") as f:
      configFile = f.readlines()
-_chemDict = dict(); # stores the chemicals that are particular to each pool
+_chemDict = dict() # stores the chemicals that are particular to each pool
+_seqPoolDict = dict()
 currentPool = "";
 tempChemList = list();
 for line in configFile:
@@ -23,13 +34,9 @@ for line in configFile:
           currentChem=line.rstrip("\n").rstrip().lower().replace(" ","_") #chemicals are lower case, and have no spaces
           currentChemicals.append(currentChem)
           tempChemList.append(currentChem)
-del _chemDict["ENRICHMENT"] #Enrichment is a variable, not a pool
-del _chemDict["CONFOUNDING"] #Confounding is a variable, not a pool
 
 _chemDict[currentPool] = set(currentChemicals); #add the last entry
 _chemList = set(tempChemList) #list of unique chemicals needed for initialzing entries in _chemHash
-enrichmentThreshold = float(configFile[0].split(" ")[3]) #ratio required between new pool and original to be considered enriched
-confoundingThreshold = float(configFile[1].split(" ")[3]) #difference between chemical and _notchemical to be considered nonconfounding
 
 
 #initialize chemHash
@@ -94,6 +101,10 @@ for key in _ratioHash:
           for posChem in positiveChemicals:
                # increment the positive entries
                addSeqEntry(sequence, posChem)
+               if sequence in _seqPoolDict.keys():
+                    _seqPoolDict[sequence].append(key)
+               else:
+                    _seqPoolDict[sequence]=[key]
           for negChem in negativeChemicals:
                # increment the negative entries
                addSeqEntry(sequence, negChem)
@@ -110,12 +121,18 @@ for sequence in _chemHash.keys():
 for sequence in _chemHash.keys():
      if not len(_chemHash[sequence]) > 0:
           del _chemHash[sequence]
+# remove chemicals that didn't enrich in at least 2 pools
+for sequence in _chemHash.keys():
+     pools = set(_seqPoolDict[sequence])
+     if len(pools) < poolThreshold:
+          del _chemHash[sequence]
+     
 # print out results
 for sequence in _chemHash.keys():
      string = sequence 
      for chemical in _chemHash[sequence]:
           string = string+","+ chemical +" "+str(_chemHash[sequence][chemical])
-     print string     
+     #print string     
 
 
 
