@@ -3,7 +3,7 @@
 # second argument is confounding threshold
 # third argument is path to data
 # fourth argument is the number of times a chemical has to enrich a sequence
-# ie, how many different pools has a chemmical that enriches a sequence
+# ie, how many different pools has a chemical that enriches a sequence
 import os
 import sys
 enrichmentThreshold = float(sys.argv[1]) #ratio required between new pool and original to be considered enriched
@@ -123,22 +123,30 @@ for sequence in _chemHash.keys():
 # remove chemicals that didn't enrich in at least 2 pools
 for sequence in _chemHash.keys():
      pools = set(_seqPoolDict[sequence])
-     if len(pools) <= poolThreshold:
+     if len(pools) < poolThreshold:
           del _chemHash[sequence]
-     chemicals = list()
+for sequence in _chemHash.keys():
+     pools = set(_seqPoolDict[sequence])
+     chemicals = set(_chemDict[_chemDict.keys()[0]])
      for pool in pools:
-         for chem in _chemList:
-              chemicals.append(chem) 
-     print "chem size size: "+str(len(set(chemicals)))
-     if len(set(chemicals)) <= poolThreshold:
-          del _chemHash[sequence]
+          chemicals = chemicals & set(_chemDict[pool])
+     if len(chemicals) < poolThreshold:
+          del _chemHash[sequence]	
+
+     #chemicals = list()
+     #for pool in pools:
+     #    for chem in _chemList:
+     #         chemicals.append(chem) 
+     #print "chem size size: "+str(len(set(chemicals)))
+     #if len(set(chemicals)) <= poolThreshold:
+     #     del _chemHash[sequence]
 # print out results
 for sequence in _chemHash.keys():
      string = sequence 
      for chemical in _chemHash[sequence]:
           string = string+","+ chemical
      print string     
-
+print "number of results: "+str(len(_chemHash.keys()))
 
 
 

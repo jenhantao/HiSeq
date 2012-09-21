@@ -123,22 +123,30 @@ for sequence in _chemHash.keys():
 # remove chemicals that didn't enrich in at least 2 pools
 for sequence in _chemHash.keys():
      pools = set(_seqPoolDict[sequence])
-     if len(pools) <= poolThreshold:
+     if len(pools) < poolThreshold:
           del _chemHash[sequence]
-     chemicals = list()
+for sequence in _chemHash.keys():
+     pools = set(_seqPoolDict[sequence])
+     chemicals = set(_chemDict[_chemDict.keys()[0]])
      for pool in pools:
-         for chem in _chemList:
-              chemicals.append(chem) 
-     print "chem size size: "+str(len(chemicals))
-     if len(set(chemicals)) <= poolThreshold:
-          del _chemHash[sequence]
+          chemicals = chemicals & set(_chemDict[pool])
+     if len(chemicals) < poolThreshold:
+          del _chemHash[sequence]	
+
+     #chemicals = list()
+     #for pool in pools:
+     #    for chem in _chemList:
+     #         chemicals.append(chem) 
+     #print "chem size size: "+str(len(set(chemicals)))
+     #if len(set(chemicals)) <= poolThreshold:
+     #     del _chemHash[sequence]
 # print out results
 for sequence in _chemHash.keys():
      string = sequence 
      for chemical in _chemHash[sequence]:
           string = string+","+ chemical
      print string     
-
+print "number of results: "+str(len(_chemHash.keys()))
 
 
 
