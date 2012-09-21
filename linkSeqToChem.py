@@ -5,12 +5,11 @@
 # fourth argument is the number of times a chemical has to enrich a sequence
 # ie, how many different pools has a chemmical that enriches a sequence
 import os
-path="./data"  # insert the path to the directory of interest here
-
-enrichmentThreshold = float(sys.argv[0]) #ratio required between new pool and original to be considered enriched
-confoundingThreshold = float(sys.argv[1]) #difference between chemical and _notchemical to be considered nonconfounding
-path = sys.argv[2]
-poolThreshold = sys.argv[3]
+import sys
+enrichmentThreshold = float(sys.argv[1]) #ratio required between new pool and original to be considered enriched
+confoundingThreshold = float(sys.argv[2]) #difference between chemical and _notchemical to be considered nonconfounding
+path = sys.argv[3]
+poolThreshold = float(sys.argv[4])
 
 # I want to process the .his values which are just raw counts of every sequence that appears
 # I want to process the .val files which are derviced from the .proc files
@@ -124,15 +123,21 @@ for sequence in _chemHash.keys():
 # remove chemicals that didn't enrich in at least 2 pools
 for sequence in _chemHash.keys():
      pools = set(_seqPoolDict[sequence])
-     if len(pools) < poolThreshold:
+     if len(pools) <= poolThreshold:
           del _chemHash[sequence]
-     
+     chemicals = list()
+     for pool in pools:
+         for chem in _chemList:
+              chemicals.append(chem) 
+     print "chem size size: "+str(len(set(chemicals)))
+     if len(set(chemicals)) <= poolThreshold:
+          del _chemHash[sequence]
 # print out results
 for sequence in _chemHash.keys():
      string = sequence 
      for chemical in _chemHash[sequence]:
-          string = string+","+ chemical +" "+str(_chemHash[sequence][chemical])
-     #print string     
+          string = string+","+ chemical
+     print string     
 
 
 
