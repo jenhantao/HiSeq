@@ -20,7 +20,7 @@ dirList=os.listdir(path)
 with open("./data/chempools.config") as f:
      configFile = f.readlines()
 _chemDict = dict() # stores the chemicals that are particular to each pool
-_seqPoolDict = dict()
+_seqPoolDict = dict() # stores the pools that the sequences appear in. key is sequence, value is a list of pools
 currentPool = "";
 tempChemList = list();
 for line in configFile:
@@ -131,20 +131,16 @@ for sequence in _chemHash.keys():
      for pool in pools:
           chemicals = chemicals & set(_chemDict[pool])
      if len(chemicals) < poolThreshold:
-          del _chemHash[sequence]	
-
-     #chemicals = list()
-     #for pool in pools:
-     #    for chem in _chemList:
-     #         chemicals.append(chem) 
-     #print "chem size size: "+str(len(set(chemicals)))
-     #if len(set(chemicals)) <= poolThreshold:
-     #     del _chemHash[sequence]
+          del _chemHash[sequence]
+     else:
+          _chemHash[sequence] = chemicals	
 # print out results
 for sequence in _chemHash.keys():
-     string = sequence 
+     string = sequence      
      for chemical in _chemHash[sequence]:
           string = string+","+ chemical
+     for pool in set(_seqPoolDict[sequence]):
+          string = string + "," + pool+"="+str(_ratioHash[pool][sequence])
      print string     
 print "number of results: "+str(len(_chemHash.keys()))
 
