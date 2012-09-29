@@ -1,9 +1,11 @@
 #!/usr/bin/python
+
 # first argument is enrichment ratio threshold
 # second argument is confounding threshold
 # third argument is path to data
 # fourth argument is the number of times a chemical has to enrich a sequence
 # ie, how many different pools has a chemical that enriches a sequence
+# fifth argument gives how many pools a sequence in a pool has to beat
 import os
 import sys
 
@@ -17,6 +19,7 @@ enrichmentThreshold = float(sys.argv[1]) #ratio required between new pool and or
 confoundingThreshold = float(sys.argv[2]) #difference between chemical and _notchemical to be considered nonconfounding
 path = sys.argv[3]
 poolThreshold = float(sys.argv[4])
+majorityThreshold = float(sys.argv[4])
 
 # I want to process the .his values which are just raw counts of every sequence that appears
 # I want to process the .val files which are derviced from the .proc files
@@ -24,7 +27,7 @@ poolThreshold = float(sys.argv[4])
 
 dirList=os.listdir(path)
 #read in configuration file and store each unique chemical
-with open(path+"/chempools2.config") as f:
+with open(path+"/chempools.config") as f:
      configFile = f.readlines()
 _chemDict = dict() # stores the chemicals that are particular to each pool
 _seqPoolDict = dict() # stores the pools that the sequences appear in. key is sequence, value is a list of pools
