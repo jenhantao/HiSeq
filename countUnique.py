@@ -14,7 +14,7 @@ result = []
 fileList = os.listdir(path)
 numberOfSequences = 0
 for file in fileList:
-   if "test" in file:
+   if "fastq" in file:
       with open(path + "/" +
 file) as f:
          for line in f:
