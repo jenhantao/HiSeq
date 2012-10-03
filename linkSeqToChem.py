@@ -148,7 +148,7 @@ for sequence in _chemHash.keys():
           toRemove.append(sequence)
 for sequence in toRemove:
      del _chemHash[sequence]
-# remove chemicals that didn't enrich in at least 2 pools
+# remove sequences that didn't enrich in at least 2 pools
 del toRemove[0:len(toRemove)]
 for sequence in _chemHash.keys():
      pools = set(_seqPoolDict[sequence])

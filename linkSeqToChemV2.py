@@ -19,7 +19,7 @@ enrichmentThreshold = float(sys.argv[1]) #ratio required between new pool and or
 confoundingThreshold = float(sys.argv[2]) #difference between chemical and _notchemical to be considered nonconfounding
 path = sys.argv[3] # path to the data and output log files
 poolThreshold = float(sys.argv[4]) # in how many pools must a sequence be enriched in
-majorityThreshold = float(sys.argv[4]) #how many pools must a sequence from a particular pool beat
+majorityThreshold = float(sys.argv[5]) #how many pools must a sequence from a particular pool beat
 
 # I want to process the .his values which are just raw counts of every sequence that appears
 # I want to process the .val files which are derviced from the .proc files
@@ -46,50 +46,32 @@ for line in configFile:
 
 _chemDict[currentPool] = set(currentChemicals); #add the last entry
 _chemList = set(tempChemList) #list of unique chemicals needed for initialzing entries in _chemHash
+poolKeys = sorted(_chemDict.keys())
+
+# store conflicting pools
+# if two pools don't share at least one chemical, then eliminate the second pool
+#_chemDict stores the chemicals that are particular to each pool
+_conflictHash = dict()
+for i in range(len(poolKeys)):
+   _conflictHash[poolKeys[i]] = []
+   for j in range(len(poolKeys)):
+       if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1: # two pools must share at least one chemical
+          # store this as a conflict
+          print poolKeys[i] + " conflicts with "+ poolKeys[j]
+          _conflictHash[poolKeys[i]].append(poolKeys[j])
+for key in _conflictHash.keys():
+   _conflictHash[key] = set(_conflictHash[key])
 
 
-#initialize chemHash
-_chemHash = dict()
-#this dictionary will contain all of they sequences and the chemicals that enrich them
-#key will be the sequence as a string, value will be a dictionary containing each of the chemicals
-#and the number of times each chemical has enriched the given sequence
 _populationHash = dict() #key is the pool, value is the total count for the pool
-# this function will initialize the entry for a sequence in 
-def addSeqEntry(sequence,chemical):
-     sequence = sequence.upper() # all sequences are upper case
-     chemical = chemical.lower() # all chemicals are lower case
-     if sequence in _chemHash:
-          # if key already exists, update it
-          _chemHash[sequence][chemical] = _chemHash[sequence][chemical]+1
-     else:
-          # if key doesn't exist, initialize an empty dictionary for the value, and then incrememnt the chemcial
-          newDict = dict();
-          for chem in _chemList:
-                        newDict[chem]= 0
-                        newDict["not_"+chem]=0; #also initialize an entry corresponding to the lack of a particuar chemical;
-                                                #this will be used to account for confounding data
-          newDict[chemical] = 1;
-          _chemHash[sequence] = newDict;
-          
 
 # read in the his files specified by the chempool.config
 
 _ratioHash = dict() #a dictionary that will hold the enrichment ratios for all of the pools (excepting for the last one, the prephage selection
                     #key is the pool name as indicated in the config file, value is a dictionary containing the enrichment values
-poolKeys = sorted(_chemDict.keys())
-# last pool is presumed to be the pre-phage selection
-prephageHistValues = dict(); #key is sequence, value is count
-with open("./data/"+poolKeys[-1]+".his") as f:
-     hisFile = f.readlines()
-totalCount = 0;
-for line in hisFile:
-     if len(line)>0:
-          tokens = line.rstrip("\n").split("\t")
-          prephageHistValues[tokens[0]]=tokens[1]
-          totalCount = totalCount + float(tokens[1])
-_populationHash[poolKeys[-1]] = totalCount
-#print("total population for "+poolKeys[-1]+": "+ str(totalCount))
-for i in range(len(poolKeys)-1):
+# calculate the total populations
+
+for i in range(len(poolKeys)):
      totalCount = 0
      with open("./data/"+poolKeys[i]+".his") as f:
           hisFile = f.readlines()
@@ -99,88 +81,45 @@ for i in range(len(poolKeys)-1):
      #print("total population for "+poolKeys[i]+": "+ str(totalCount))     
      _populationHash[poolKeys[i]] = totalCount
 
-droppedSeqLog = open("droppedSequences.txt", "w")               
-for i in range(len(poolKeys)-1):
-     with open("./data/"+poolKeys[i]+".his") as f:
-          hisFile = f.readlines()
-     currentRatioDict = dict()
-     for line in hisFile:
-          tokens = line.rstrip("\n").split("\t")
-          if tokens[0] in prephageHistValues:
-               ratio = (float(tokens[1])/_populationHash[poolKeys[i]])/(float(prephageHistValues[tokens[0]])/_populationHash[poolKeys[-1]])
-               if ratio >= enrichmentThreshold:
-                    currentRatioDict[tokens[0]] = ratio
-          else:
-               droppedSeqLog.write(tokens[0]+"\n")
-     _ratioHash[poolKeys[i]]=currentRatioDict
-
-
-# produce the data set that we're interested in, list of sequences and the chemicals that enrich them
-for key in _ratioHash:
-     positiveChemicals = set(_chemDict[key]) #chemicals that actually exist
-     negativeChemicals = [] #chemicals that don't exist
-     temp = set(_chemList)-positiveChemicals
-     for chem in temp:
-          negativeChemicals.append("not_"+chem)
-     positiveChemicals = sorted(positiveChemicals)
-     negativeChemicals = sorted(negativeChemicals)
-     for sequence in _ratioHash[key]:
-          if sequence in _seqPoolDict.keys():
-               _seqPoolDict[sequence].append(key)
-          else:
-               _seqPoolDict[sequence]=[key]
-          for posChem in positiveChemicals:
-               # increment the positive entries
-               addSeqEntry(sequence, posChem)              
-          for negChem in negativeChemicals:
-               # increment the negative entries
-               addSeqEntry(sequence, negChem)
-
-# eliminate confounding chemicals and remove them from dictionary
-for sequence in _chemHash.keys():
-     for chemical in _chemList:
-          if not _chemHash[sequence][chemical]-_chemHash[sequence]["not_"+chemical] >= _chemHash[sequence][chemical]-confoundingThreshold:
-               del _chemHash[sequence][chemical]
-               del _chemHash[sequence]["not_"+chemical]
-          else:
-               del _chemHash[sequence]["not_"+chemical] #not_chemical is not confounding or enriching, so delete it
-# remove empty entries
-toRemove = []
-for sequence in _chemHash.keys():
-     if not len(_chemHash[sequence]) > 0:
-          toRemove.append(sequence)
-for sequence in toRemove:
-     del _chemHash[sequence]
-# remove chemicals that didn't enrich in at least 2 pools
-del toRemove[0:len(toRemove)]
-for sequence in _chemHash.keys():
-     if sequence in _seqPoolDict.keys():
-          pools = set(_seqPoolDict[sequence])
-          if len(pools) < poolThreshold:
-               toRemove.append(sequence)
-          else:
-               toRemove.append(sequence) # this else case really shouldn't happen...
-for sequence in _chemHash.keys():
-     pools = set(_seqPoolDict[sequence])
-     chemicals = set(_chemDict[list(_chemDict.keys())[0]])
-     for pool in pools:
-          chemicals = chemicals & set(_chemDict[pool])
-     if len(chemicals) < poolThreshold:
-         toRemove.append(sequence)
-     else:
-          _chemHash[sequence] = chemicals
-for sequence in toRemove:
-     if sequence in _chemHash.keys():
-          del _chemHash[sequence]
+# calculate ratios for each pool
+_ratioHash = dict() # dictionary of dictionaries; key is the pool, value is dictionary containing sequence ratio pairs
+for i in range(len(poolKeys)):
+   _ratioHash[poolKeys[i]] = dict();
+   with open("./data/"+poolKeys[i]+".his") as f:
+      hisFile = f.readlines()
+   for line in hisFile:
+      tokens = line.rstrip("\n").split("\t")
+      sequence = tokens[0]
+      seqCount = float(tokens[1])
+      _ratioHash[poolKeys[i]][sequence] = seqCount/_populationHash[poolKeys[i]]
+      #print("seqCount: "+str(seqCount)+" total: "+str(_populationHash[poolKeys[i]]) +" ratio: "+ str(seqCount/_populationHash[poolKeys[i]]))     
+droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
+# compare each pool to all of the other pools
+_resultHash = dict() # key is sequence value is set of pools that it enriches in
+for i in range(len(poolKeys)):
+   for sequence in _ratioHash[poolKeys[i]].keys():   
+      beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
+      for j in range(len(poolKeys)):
+         if not i==j: # don't compare a sequence to itself 
+            if poolKeys[i] not in _conflictHash[poolKeys[j]]: # pools conflict so don't look at them
+               if sequence in _ratioHash[poolKeys[j]].keys():
+                  if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
+                     beatenCount = beatenCount + 1
+               else:
+                  droppedSeqLog.write(tokens[0]+"\n")
+      if beatenCount >= majorityThreshold:
+         if sequence in _resultHash.keys():
+            _resultHash[sequence] = _resultHash[sequence] | set(poolKeys[i]) # union is the only way I know to add to a set
+         else:
+            _resultHash[sequence] = set(poolKeys[i])
+         #print "we've got a hit; beatenCount: "+str(beatenCount)+" majorityThreshold: "+str(majorityThreshold)
 # print out results
-for sequence in _chemHash.keys():
-     string = sequence      
-     for chemical in _chemHash[sequence]:
-          string = string+","+ chemical
-     for pool in set(_seqPoolDict[sequence]):
-          string = string + "," + pool+"="+str(_ratioHash[pool][sequence])
-     print(string)  
-print ("number of results: "+str(len(_chemHash.keys())))
+
+print("number of hits: "+str(len(_resultHash.keys())))
+
+
+
+
 
 
 
