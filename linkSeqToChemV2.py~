@@ -55,9 +55,9 @@ _conflictHash = dict()
 for i in range(len(poolKeys)):
    _conflictHash[poolKeys[i]] = []
    for j in range(len(poolKeys)):
-       if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1: # two pools must share at least one chemical
+       if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1 and not i == j: # two pools must share at least one chemical
           # store this as a conflict
-          print poolKeys[i] + " conflicts with "+ poolKeys[j]
+          #print poolKeys[i] + " conflicts with "+ poolKeys[j]
           _conflictHash[poolKeys[i]].append(poolKeys[j])
 for key in _conflictHash.keys():
    _conflictHash[key] = set(_conflictHash[key])
@@ -76,9 +76,9 @@ for i in range(len(poolKeys)):
      with open("./data/"+poolKeys[i]+".his") as f:
           hisFile = f.readlines()
      for line in hisFile:
+          #print poolKeys[i]
           tokens = line.rstrip("\n").split("\t")
-          totalCount = totalCount + float(tokens[1])
-     #print("total population for "+poolKeys[i]+": "+ str(totalCount))     
+          totalCount = totalCount + float(tokens[1])     
      _populationHash[poolKeys[i]] = totalCount
 
 # calculate ratios for each pool
@@ -101,7 +101,20 @@ for i in range(len(poolKeys)):
       beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
       for j in range(len(poolKeys)):
          if not i==j: # don't compare a sequence to itself 
-            if poolKeys[i] not in _conflictHash[poolKeys[j]]: # pools conflict so don't look at them
+
+
+
+            # generate all potential conflicting pools
+            potentialConflicts = set()
+            if sequence in _resultHash.keys():
+               for pool in _resultHash[sequence]:
+                  potentialConflicts = potentialConflicts | _conflictHash[pool]
+            potentialConflicts = potentialConflicts | _conflictHash[poolKeys[i]]
+           # print "pool "+poolKeys[i]+" "+str(potentialConflicts)
+
+
+
+            if poolKeys[j] not in potentialConflicts: # pools conflict so don't look at them
                if sequence in _ratioHash[poolKeys[j]].keys():
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
                      beatenCount = beatenCount + 1
@@ -115,12 +128,15 @@ for i in range(len(poolKeys)):
          #print "we've got a hit; beatenCount: "+str(beatenCount)+" majorityThreshold: "+str(majorityThreshold)
 # print out results
 for sequence in _resultHash.keys():
-     string = sequence      
-     for chemical in _chemHash[sequence]:
-          string = string+","+ chemical
-     for pool in set(_seqPoolDict[sequence]):
-          string = string + "," + pool+"="+str(_ratioHash[pool][sequence])
-     print(string)   
+   resultString = sequence
+   #chemicals that enrich are the intersection of the chemicals of the enriched pools
+   chemicals = set()   
+   for pool in _resultHash[sequence]:
+      chemicals = chemicals & _chemDict[pool]
+   if len(chemicals) > 0:
+      for chemical in chemicals:
+         resultString = resultString+","+chemical
+
 print("number of hits: "+str(len(_resultHash.keys())))
 
 
