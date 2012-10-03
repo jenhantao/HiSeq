@@ -27,7 +27,7 @@ majorityThreshold = float(sys.argv[4])
 
 dirList=os.listdir(path)
 #read in configuration file and store each unique chemical
-with open(path+"/chempools.config") as f:
+with open(path+"/chempools2.config") as f:
      configFile = f.readlines()
 _chemDict = dict() # stores the chemicals that are particular to each pool
 _seqPoolDict = dict() # stores the pools that the sequences appear in. key is sequence, value is a list of pools
@@ -122,13 +122,13 @@ for key in _ratioHash:
      positiveChemicals = sorted(positiveChemicals)
      negativeChemicals = sorted(negativeChemicals)
      for sequence in _ratioHash[key]:
+          if sequence in _seqPoolDict.keys():
+               _seqPoolDict[sequence].append(key)
+          else:
+               _seqPoolDict[sequence]=[key
           for posChem in positiveChemicals:
                # increment the positive entries
                addSeqEntry(sequence, posChem)
-               if sequence in _seqPoolDict.keys():
-                    _seqPoolDict[sequence].append(key)
-               else:
-                    _seqPoolDict[sequence]=[key]
           for negChem in negativeChemicals:
                # increment the negative entries
                addSeqEntry(sequence, negChem)
