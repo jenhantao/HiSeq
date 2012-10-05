@@ -6,9 +6,9 @@ import os
 import sys
 
 sys.argv = ["","", "", "", ""]
-sys.argv[1] = "./testdata"
+sys.argv[1] = "./data"
 sys.argv[2] = 5
-sys.argv[3] = 1
+sys.argv[3] = 5
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
@@ -20,7 +20,7 @@ majorityThreshold = float(sys.argv[3]) #how many pools must a sequence from a pa
 
 dirList=os.listdir(path)
 #read in configuration file and store each unique chemical
-with open(path+"/test.config") as f:
+with open(path+"/chempools.config") as f:
      configFile = f.readlines()
 _chemDict = dict() # stores the chemicals that are particular to each pool
 _seqPoolDict = dict() # stores the pools that the sequences appear in. key is sequence, value is a list of pools
@@ -49,7 +49,7 @@ for i in range(len(poolKeys)):
    for j in range(len(poolKeys)):
        if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1 and not i == j: # two pools must share at least one chemical
           # store this as a conflict
-          print poolKeys[i] + " conflicts with "+ poolKeys[j]
+          #print poolKeys[i] + " conflicts with "+ poolKeys[j]
           _conflictHash[poolKeys[i]].append(poolKeys[j])
 for key in _conflictHash.keys():
    _conflictHash[key] = set(_conflictHash[key])
@@ -98,14 +98,11 @@ _resultHash = dict() # key is sequence value is set of pools that it enriches in
 #count = 0;
 #_seenSequences = dict() #hashset style
 for i in range(len(poolKeys)):
-   print "################## "+(poolKeys[i])+" ##################"
+   #print "################## "+(poolKeys[i])+" ##################"
    for sequence in _ratioHash[poolKeys[i]].keys():
       #print _ratioHash[poolKeys[i]].keys()
       beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
       for j in range(len(poolKeys)):
-         #count = count +1;
-         #print count
-         #print sequence + " "+ str(i)+" "+str(j)
          if not i==j:# and sequence not in _seenSequences.keys(): # don't compare a pool to itself
             #_seenSequences[sequence]=""
             # generate all potential conflicting pools
@@ -116,9 +113,9 @@ for i in range(len(poolKeys)):
             potentialConflicts = potentialConflicts | _conflictHash[poolKeys[i]]
             "potential conflicts: "+str(potentialConflicts)
             if poolKeys[j] not in potentialConflicts: # pools conflict so don't look at them
-               print sequence+" comparing " +poolKeys[i] +" and "+ poolKeys[j]
+               #print sequence+" comparing " +poolKeys[i] +" and "+ poolKeys[j]
                if sequence in _ratioHash[poolKeys[j]].keys():
-                  print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
+                  #print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
                      beatenCount = beatenCount + 1
                
@@ -127,7 +124,7 @@ for i in range(len(poolKeys)):
             _resultHash[sequence] = _resultHash[sequence] | set(poolKeys[i]) # union is the only way I know to add to a set
          else:
             _resultHash[sequence] = set(poolKeys[i])
-         print "we've got a hit; beatenCount: "+str(beatenCount)+" majorityThreshold: "+str(majorityThreshold)
+         #print "we've got a hit; beatenCount: "+str(beatenCount)+" majorityThreshold: "+str(majorityThreshold)
       else:
          droppedSeqLog.write(tokens[0]+"\n")
 # print out results
