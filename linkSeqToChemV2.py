@@ -11,7 +11,7 @@ sys.argv = ["","", "", "", ""]
 sys.argv[1] = "./testdata"
 sys.argv[2] = 5
 sys.argv[3] = 3
-sys.argv[4] = 0
+sys.argv[4] = 5
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
@@ -125,8 +125,8 @@ for i in range(len(poolKeys)):
       if beatenCount >= majorityThreshold:
          if sequence in _resultHash.keys():
             _resultHash[sequence] = _resultHash[sequence] | set(poolKeys[i]) # union is the only way I know to add to a set
-         else:
-            _resultHash[sequence] = set(poolKeys[i])
+         #else:
+         #   _resultHash[sequence] = set(poolKeys[i])
          #print "we've got a hit; beatenCount: "+str(beatenCount)+" majorityThreshold: "+str(majorityThreshold)
       else:
          droppedSeqLog.write(tokens[0]+"\n")
