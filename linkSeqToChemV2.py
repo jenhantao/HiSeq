@@ -53,7 +53,7 @@ for i in range(len(poolKeys)):
    for j in range(len(poolKeys)):
        if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1 and not i == j: # two pools must share at least one chemical
           # store this as a conflict
-          #print poolKeys[i] + " conflicts with "+ poolKeys[j]
+          print poolKeys[i] + " conflicts with "+ poolKeys[j]
           _conflictHash[poolKeys[i]].append(poolKeys[j])
 for key in _conflictHash.keys():
    _conflictHash[key] = set(_conflictHash[key])
@@ -89,36 +89,39 @@ for i in range(len(poolKeys)):
       #print count
       #count = count + 1
       tokens = line.rstrip("\n").split("\t")
-      sequence = tokens[0]
-      seqCount = float(tokens[1])
-      _ratioHash[poolKeys[i]][sequence] = seqCount/_populationHash[poolKeys[i]]
+      if len(tokens)>1:
+         sequence = tokens[0]
+         seqCount = float(tokens[1])
+         _ratioHash[poolKeys[i]][sequence] = seqCount/_populationHash[poolKeys[i]]
       #print("seqCount: "+str(seqCount)+" total: "+str(_populationHash[poolKeys[i]]) +" ratio: "+ str(seqCount/_populationHash[poolKeys[i]]))
 
 
 droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
 # compare each pool to all of the other pools
 _resultHash = dict() # key is sequence value is set of pools that it enriches in
-count = 0;
-_seenSequences = dict() #hashset style
+#count = 0;
+#_seenSequences = dict() #hashset style
 for i in range(len(poolKeys)):
    for sequence in _ratioHash[poolKeys[i]].keys():
       #print _ratioHash[poolKeys[i]].keys()
       beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
       for j in range(len(poolKeys)):
-         count = count +1;
+         #count = count +1;
          #print count
          #print sequence + " "+ str(i)+" "+str(j)
-         if not i==j and sequence not in _seenSequences.keys(): # don't compare a pool to itself
-            _seenSequences[sequence]=""
+         if not i==j:# and sequence not in _seenSequences.keys(): # don't compare a pool to itself
+            #_seenSequences[sequence]=""
             # generate all potential conflicting pools
             potentialConflicts = set()
             if sequence in _resultHash.keys():
                for pool in _resultHash[sequence]:
                   potentialConflicts = potentialConflicts | _conflictHash[pool]
             potentialConflicts = potentialConflicts | _conflictHash[poolKeys[i]]
-           # print "pool "+poolKeys[i]+" "+str(potentialConflicts)
+            print "pool "+poolKeys[i]+" conflicts with "+str(potentialConflicts)
             if poolKeys[j] not in potentialConflicts: # pools conflict so don't look at them
+               print "comparing " +poolKeys[i] +" and "+ poolKeys[j]
                if sequence in _ratioHash[poolKeys[j]].keys():
+                  print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
                      beatenCount = beatenCount + 1
                
