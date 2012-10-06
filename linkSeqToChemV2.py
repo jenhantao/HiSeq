@@ -7,7 +7,7 @@ import os
 import sys
 
 sys.argv = ["","", "", "", ""]
-sys.argv[1] = "./testdata"
+sys.argv[1] = "./data"
 sys.argv[2] = 5
 sys.argv[3] = 1
 sys.argv[4] = 1
@@ -42,30 +42,6 @@ for line in configFile:
 _chemDict[currentPool] = set(currentChemicals); #add the last entry
 _chemList = set(tempChemList) #list of unique chemicals needed for initialzing entries in _chemHash
 poolKeys = sorted(_chemDict.keys())
-### store conflicting pools
-### if two pools don't share at least one chemical, then eliminate the second pool
-###_chemDict stores the chemicals that are particular to each pool
-##_conflictHash = dict()
-##_nonconflictHash = dict()
-##for i in range(len(poolKeys)):
-##   _conflictHash[poolKeys[i]] = []
-##   for j in range(len(poolKeys)):
-##       #if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < min([len(_chemDict[poolKeys[i]]) , len(_chemDict[poolKeys[j]])]) and not i == j:
-##       if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1 and not i == j:           
-##          #print poolKeys[i]+" compared to "+poolKeys[j]
-##          #print "min of "+str(len(_chemDict[poolKeys[i]]))+" and "+ str(len(_chemDict[poolKeys[j]]))+ " is "+str(min([len(_chemDict[poolKeys[i]]) , len(_chemDict[poolKeys[j]])]))
-##          #print "intersection length: "+str(len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]))
-##          if not poolKeys[i]+"|"+poolKeys[j] in _nonconflictHash.keys():
-##             # store this as a conflict
-##              #print poolKeys[i] + " conflicts with "+ poolKeys[j]
-##              _conflictHash[poolKeys[i]].append(poolKeys[j])
-##       else:
-##          _nonconflictHash[poolKeys[i]+"|"+poolKeys[j]]=""
-##          _nonconflictHash[poolKeys[j]+"|"+poolKeys[i]]=""
-##for key in _conflictHash.keys():
-##   _conflictHash[key] = set(_conflictHash[key])
-##   print key +" conflicts with "+ str(_conflictHash[key])
-
 
 _populationHash = dict() #key is the pool, value is the total count for the pool
 
@@ -83,7 +59,6 @@ for i in range(len(poolKeys)):
           #print poolKeys[i]
           tokens = line.rstrip("\n").split("\t")
           totalCount = totalCount + float(tokens[1])
-     #print poolKeys[i] + " contains " +str(totalCount)
      _populationHash[poolKeys[i]] = totalCount
 
 # calculate ratios for each pool
@@ -122,25 +97,13 @@ for sequence in _averageHash.keys():
 droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
 # compare each pool to all of the other pools
 _resultHash = dict() # key is sequence value is set of pools that it enriches in
-#count = 0;
-#_seenSequences = dict() #hashset style
 for i in range(len(poolKeys)):
    print "################## "+(poolKeys[i])+" ##################"
    for sequence in _ratioHash[poolKeys[i]].keys():
       #print _ratioHash[poolKeys[i]].keys()
       beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
       for j in range(len(poolKeys)):
-         if not i==j:# and sequence not in _seenSequences.keys(): # don't compare a pool to itself
-            #_seenSequences[sequence]=""
-            # generate all potential conflicting pools
-            #potentialConflicts = set()
-            #if sequence in _resultHash.keys():
-               #for pool in _resultHash[sequence]:
-               #   potentialConflicts = potentialConflicts | _conflictHash[pool]
-            #potentialConflicts = potentialConflicts | _conflictHash[poolKeys[i]]
-            #"potential conflicts: "+str(potentialConflicts)
-            #if poolKeys[j] not in potentialConflicts: # pools conflict so don't look at them
-               #print sequence+" comparing " +poolKeys[i] +" and "+ poolKeys[j]
+         if not i==j: # don't compare a pool to itself
                if sequence in _ratioHash[poolKeys[j]].keys():
                   print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
@@ -151,7 +114,6 @@ for i in range(len(poolKeys)):
             _resultHash[sequence] = _resultHash[sequence] | set(poolKeys[i]) # union is the only way I know to add to a set
          else:
             _resultHash[sequence] = set(poolKeys[i])
-         #print "we've got a hit; beatenCount: "+str(beatenCount)+" majorityThreshold: "+str(majorityThreshold)
       else:
          droppedSeqLog.write(tokens[0]+"\n")
 
@@ -165,16 +127,12 @@ for sequence in _resultHash.keys():
       for j in range(len(currentPools)):
          comparedPool = currentPools[j]
          if not pool == comparedPool: #don't compare the same pool
-            #print "pool: "+ str(_chemDict[pool])
-            #print "comp: "+ str(_chemDict[comparedPool])
             if len(_chemDict[pool] &  _chemDict[comparedPool]) > 0: 
                overlapCount = overlapCount + 1
       if not overlapCount >= poolThreshold: 
          # remove the pool from the results
          _resultHash[sequence] = _resultHash[sequence] - set(pool)
-
-print("pre filter number of hits: "+str(len(_resultHash.keys())))
-      
+  
 # print out results
 for sequence in _resultHash.keys():
    resultString = sequence # + ", mean="+str(_averageHash[sequence])
