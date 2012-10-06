@@ -6,9 +6,9 @@ import os
 import sys
 
 sys.argv = ["","", "", "", ""]
-sys.argv[1] = "./data"
+sys.argv[1] = "./testdata"
 sys.argv[2] = 5
-sys.argv[3] = 5
+sys.argv[3] = 1
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
@@ -44,13 +44,19 @@ poolKeys = sorted(_chemDict.keys())
 # if two pools don't share at least one chemical, then eliminate the second pool
 #_chemDict stores the chemicals that are particular to each pool
 _conflictHash = dict()
+_nonconflictHash = dict()
 for i in range(len(poolKeys)):
    _conflictHash[poolKeys[i]] = []
    for j in range(len(poolKeys)):
-       if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < 1 and not i == j: # two pools must share at least one chemical
-          # store this as a conflict
-          #print poolKeys[i] + " conflicts with "+ poolKeys[j]
-          _conflictHash[poolKeys[i]].append(poolKeys[j])
+       if len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]) < min([len(_chemDict[poolKeys[i]]) , len(_chemDict[poolKeys[j]])]) and not i == j:
+          #print poolKeys[i]+" compared to "+poolKeys[j]+" "+str(min([len(_chemDict[poolKeys[i]]) , len(_chemDict[poolKeys[j]])]))+ " "+str(len(_chemDict[poolKeys[i]] &  _chemDict[poolKeys[j]]))
+          if not poolKeys[i]+"|"+poolKeys[j] in _nonconflictHash.keys():
+             # store this as a conflict
+             # print poolKeys[i] + " conflicts with "+ poolKeys[j]
+             _conflictHash[poolKeys[i]].append(poolKeys[j])
+       else:
+          _nonconflictHash[poolKeys[i]+"|"+poolKeys[j]]=""
+          _nonconflictHash[poolKeys[j]+"|"+poolKeys[i]]=""
 for key in _conflictHash.keys():
    _conflictHash[key] = set(_conflictHash[key])
 
@@ -76,6 +82,7 @@ for i in range(len(poolKeys)):
 
 # calculate ratios for each pool
 _ratioHash = dict() # dictionary of dictionaries; key is the pool, value is dictionary containing sequence ratio pairs
+_averageHash = dict()
 for i in range(len(poolKeys)):
    #count =0 
    _ratioHash[poolKeys[i]] = dict();
@@ -89,7 +96,22 @@ for i in range(len(poolKeys)):
          sequence = tokens[0]
          seqCount = float(tokens[1])
          _ratioHash[poolKeys[i]][sequence] = seqCount/_populationHash[poolKeys[i]]
+         if sequence not in _averageHash.keys():
+            _averageHash[sequence] = 0
       #print("seqCount: "+str(seqCount)+" total: "+str(_populationHash[poolKeys[i]]) +" ratio: "+ str(seqCount/_populationHash[poolKeys[i]]))
+
+# compute the average ratio
+for sequence in _averageHash.keys():
+   count = 0;
+   sum = 0;
+   for i in range(len(poolKeys)):
+      pool = poolKeys[i]
+      if sequence in _ratioHash[pool].keys():
+         count = count + 1
+         sum = sum + _ratioHash[pool][sequence]
+   if count > 0:
+      _averageHash[sequence] = sum/count
+
 
 
 droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
@@ -129,9 +151,11 @@ for i in range(len(poolKeys)):
          droppedSeqLog.write(tokens[0]+"\n")
 # print out results
 for sequence in _resultHash.keys():
-   resultString = sequence
+   resultString = sequence # + ", mean="+str(_averageHash[sequence])
    #chemicals that enrich are the intersection of the chemicals of the enriched pools
-   chemicals = set()   
+   chemicals = set()
+   for pool in _resultHash[sequence]:
+      resultString = resultString + "," + pool + "= " + str(_ratioHash[pool][sequence]/_averageHash[sequence])
    for pool in _resultHash[sequence]:
       if len(chemicals) > 0:
          chemicals = chemicals & _chemDict[pool]
