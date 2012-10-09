@@ -1,4 +1,4 @@
-#!/usr/bin/python
+# usr/bin/python
 # first argument is path to data
 # second argument is enrichment ratio threshold
 # third argument gives how many pools a sequence in a pool has to beat
@@ -6,23 +6,24 @@
 import os
 import sys
 
-sys.argv = ["","", "", "", ""]
-sys.argv[1] = "./data"
-sys.argv[2] = 5
-sys.argv[3] = 5
-sys.argv[4] = 2
+#sys.argv = ["","", "", "", ""]
+#sys.argv[1] = "./data"
+#sys.argv[2] = 10
+#sys.argv[3] = 5
+#sys.argv[4] = 2
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
 majorityThreshold = float(sys.argv[3]) #how many pools must a sequence from a particular pool beat
 poolThreshold = float(sys.argv[4])
+configFile = str(sys.argv[5])
 # I want to process the .his values which are just raw counts of every sequence that appears
 # I want to process the .val files which are derviced from the .proc files
 # formatting for .val files [.proc fileName] [enrichedCount] [originalCount] [enrichmentRatio]
 
 dirList=os.listdir(path)
 #read in configuration file and store each unique chemical
-with open(path+"/chempools.config") as f:
+with open(path+"/"+configFile) as f:
      configFile = f.readlines()
 _chemDict = dict() # stores the chemicals that are particular to each pool
 _seqPoolDict = dict() # stores the pools that the sequences appear in. key is sequence, value is a list of pools
@@ -105,7 +106,7 @@ for i in range(len(poolKeys)):
       for j in range(len(poolKeys)):
          if not i==j: # don't compare a pool to itself
                if sequence in _ratioHash[poolKeys[j]].keys():
-                  #print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
+                 # print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
                      beatenCount = beatenCount + 1
                
@@ -132,7 +133,8 @@ for sequence in _resultHash.keys():
       if not overlapCount >= poolThreshold: 
          # remove the pool from the results
          _resultHash[sequence] = _resultHash[sequence] - set(pool)
-  
+   if len(list(_resultHash[sequence])) < 1:
+         del _resultHash[sequence] 
 # print out results
 for sequence in _resultHash.keys():
    resultString = sequence # + ", mean="+str(_averageHash[sequence])
@@ -149,6 +151,8 @@ for sequence in _resultHash.keys():
       for chemical in chemicals:
          resultString = resultString+","+chemical
       print resultString
+   else:
+      del _resultHash[sequence]
 print("number of hits: "+str(len(_resultHash.keys())))
 
 

@@ -5,10 +5,10 @@
 # and the ratio of ratios of both sequenecs second/first
 import os
 import sys
-sys.argv=["","",""]
-path = "data/results/results552/"
-sys.argv[1] = path + "round1.csv"
-sys.argv[2] = path + "round2.csv"
+#sys.argv=["","",""]
+#path = "data/results/results552/"
+#sys.argv[1] = path + "round1.csv"
+#sys.argv[2] = path + "round2.csv"
 
 fileDict1 = dict() # key is sequence, value is rest of contents of csv file line
 fileDict2 = dict() # key is sequence, value is rest of contents of csv file line
