@@ -9,8 +9,8 @@ import sys
 sys.argv = ["","", "", "", ""]
 sys.argv[1] = "./data"
 sys.argv[2] = 5
-sys.argv[3] = 1
-sys.argv[4] = 1
+sys.argv[3] = 5
+sys.argv[4] = 2
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
@@ -98,14 +98,14 @@ droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
 # compare each pool to all of the other pools
 _resultHash = dict() # key is sequence value is set of pools that it enriches in
 for i in range(len(poolKeys)):
-   print "################## "+(poolKeys[i])+" ##################"
+   #print "################## "+(poolKeys[i])+" ##################"
    for sequence in _ratioHash[poolKeys[i]].keys():
       #print _ratioHash[poolKeys[i]].keys()
       beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
       for j in range(len(poolKeys)):
          if not i==j: # don't compare a pool to itself
                if sequence in _ratioHash[poolKeys[j]].keys():
-                  print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
+                  #print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
                      beatenCount = beatenCount + 1
                
@@ -120,7 +120,7 @@ for i in range(len(poolKeys)):
 # filter the result pools
 for sequence in _resultHash.keys():
    currentPools = list(_resultHash[sequence])
-   print currentPools
+   #print currentPools
    for i in range(len(currentPools)):
       pool = currentPools[i]
       overlapCount = 1 # with how many pools does the current pool overlap with
