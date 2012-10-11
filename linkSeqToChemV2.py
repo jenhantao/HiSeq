@@ -134,8 +134,8 @@ for sequence in _resultHash.keys():
       if not overlapCount >= poolThreshold: 
          # remove the pool from the results
          _resultHash[sequence] = _resultHash[sequence] - set(pool)
-   #if len(list(_resultHash[sequence])) < 1:
-   #      del _resultHash[sequence] 
+   if len(list(_resultHash[sequence])) < poolThreshold:
+         del _resultHash[sequence] 
 # print out results
 for sequence in _resultHash.keys():
    resultString = sequence # + ", mean="+str(_averageHash[sequence])
