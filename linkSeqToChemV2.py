@@ -6,11 +6,12 @@
 import os
 import sys
 
-#sys.argv = ["","", "", "", ""]
-#sys.argv[1] = "./data"
-#sys.argv[2] = 10
-#sys.argv[3] = 5
-#sys.argv[4] = 2
+#sys.argv = ["","", "", "", "",""]
+#sys.argv[1] = "./testdata"
+#sys.argv[2] = 5
+#sys.argv[3] = 1
+#sys.argv[4] = 1
+#sys.argv[5] = "chempools.config"
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
@@ -133,8 +134,8 @@ for sequence in _resultHash.keys():
       if not overlapCount >= poolThreshold: 
          # remove the pool from the results
          _resultHash[sequence] = _resultHash[sequence] - set(pool)
-   if len(list(_resultHash[sequence])) < 1:
-         del _resultHash[sequence] 
+   #if len(list(_resultHash[sequence])) < 1:
+   #      del _resultHash[sequence] 
 # print out results
 for sequence in _resultHash.keys():
    resultString = sequence # + ", mean="+str(_averageHash[sequence])
@@ -142,6 +143,10 @@ for sequence in _resultHash.keys():
    chemicals = set()
    for pool in _resultHash[sequence]:
       resultString = resultString + "," + pool + "= " + str(_ratioHash[pool][sequence]/_averageHash[sequence])
+   resultString = resultString+",|"
+   for pool in poolKeys:
+      if sequence in _ratioHash[pool].keys():
+         resultString = resultString+","+pool+"=" +  str(_ratioHash[pool][sequence]/_averageHash[sequence])
    for pool in _resultHash[sequence]:
       if len(chemicals) > 0:
          chemicals = chemicals & _chemDict[pool]

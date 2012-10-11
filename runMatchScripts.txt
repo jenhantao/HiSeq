@@ -1,0 +1,18 @@
+python ./findMatchBetweenRounds.py ./data/results/results552/round1.csv ./data/results/results552/round2.csv > ./data/results/results552/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results652/round1.csv ./data/results/results652/round2.csv > ./data/results/results652/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results752/round1.csv ./data/results/results752/round2.csv > ./data/results/results752/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results852/round1.csv ./data/results/results852/round2.csv > ./data/results/results852/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results952/round1.csv ./data/results/results952/round2.csv > ./data/results/results952/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results962/round1.csv ./data/results/results962/round2.csv > ./data/results/results962/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results972/round1.csv ./data/results/results972/round2.csv > ./data/results/results972/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results982/round1.csv ./data/results/results982/round2.csv > ./data/results/results982/matches.csv
+
+python ./findMatchBetweenRounds.py ./data/results/results992/round1.csv ./data/results/results992/round2.csv > ./data/results/results992/matches.csv
+
