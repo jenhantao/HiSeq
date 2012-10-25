@@ -35,7 +35,7 @@ for line in configFile:
           if len(currentPool)>0:
                _chemDict[currentPool] = set(currentChemicals);
           currentChemicals = list();
-          currentPool = line.split(" ")[1].strip("\n").upper() #all pools are upper case
+          currentPool = line.split()[1].strip("\n").upper() #all pools are upper case
      elif not line.startswith("#") and len(line) > 1:
           currentChem=line.rstrip("\n").rstrip().lower().replace(" ","_") #chemicals are lower case, and have no spaces
           currentChemicals.append(currentChem)
@@ -55,11 +55,10 @@ _ratioHash = dict() #a dictionary that will hold the enrichment ratios for all o
 
 for i in range(len(poolKeys)):
      totalCount = 0
-     with open(path+"/"+poolKeys[i]+".his") as f:
+     with open(path+"/"+poolKeys[i]+".sortedhis") as f:
           hisFile = f.readlines()
      for line in hisFile:
-          #print poolKeys[i]
-          tokens = line.rstrip("\n").split("\t")
+          tokens = line.rstrip("\n").split()
           totalCount = totalCount + float(tokens[0])
      _populationHash[poolKeys[i]] = totalCount
 
@@ -67,14 +66,11 @@ for i in range(len(poolKeys)):
 _ratioHash = dict() # dictionary of dictionaries; key is the pool, value is dictionary containing sequence ratio pairs
 _averageHash = dict()
 for i in range(len(poolKeys)):
-   #count =0 
    _ratioHash[poolKeys[i]] = dict();
-   with open(path+"/"+poolKeys[i]+".his") as f:
+   with open(path+"/"+poolKeys[i]+".sortedhis") as f:
       hisFile = f.readlines()
    for line in hisFile:
-      #print count
-      #count = count + 1
-      tokens = line.rstrip("\n").split("\t")
+      tokens = line.rstrip("\n").split()
       if len(tokens)>1:
          sequence = tokens[1]
          seqCount = float(tokens[0])
@@ -100,14 +96,11 @@ droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
 # compare each pool to all of the other pools
 _resultHash = dict() # key is sequence value is set of pools that it enriches in
 for i in range(len(poolKeys)):
-   #print "################## "+(poolKeys[i])+" ##################"
    for sequence in _ratioHash[poolKeys[i]].keys():
-      #print _ratioHash[poolKeys[i]].keys()
       beatenCount = 0 # how many pools has this sequence in pool[i] beaten?
       for j in range(len(poolKeys)):
          if not i==j: # don't compare a pool to itself
                if sequence in _ratioHash[poolKeys[j]].keys():
-                 # print str(_ratioHash[poolKeys[i]][sequence]) + " beats? " +str(enrichmentThreshold*_ratioHash[poolKeys[j]][sequence])
                   if _ratioHash[poolKeys[i]][sequence] >= enrichmentThreshold*_ratioHash[poolKeys[j]][sequence]: # if the ratio is greater than the enrichment threshold
                      beatenCount = beatenCount + 1
                
@@ -120,22 +113,28 @@ for i in range(len(poolKeys)):
          droppedSeqLog.write(tokens[1]+"\n")
 
 # filter the result pools
+_chemHash = dict() # key is sequence, value is set containing enriching chemicals
 for sequence in _resultHash.keys():
    currentPools = list(_resultHash[sequence])
-   #print currentPools
+   chemFreq = dict() # key is chemical, value is number of times that chemical occurs 
    for i in range(len(currentPools)):
       pool = currentPools[i]
-      overlapCount = 1 # with how many pools does the current pool overlap with
-      for j in range(len(currentPools)):
-         comparedPool = currentPools[j]
-         if not pool == comparedPool: #don't compare the same pool
-            if len(_chemDict[pool] &  _chemDict[comparedPool]) > 0: 
-               overlapCount = overlapCount + 1
-      if not overlapCount >= poolThreshold: 
-         # remove the pool from the results
-         _resultHash[sequence] = _resultHash[sequence] - set(pool)
+      for chem in _chemDict[pool]:
+         if chem in chemFreq.keys():
+            chemFreq[chem] = chemFreq[chem]+1
+         else:
+            chemFreq[chem] = 1
+   enrichedChemicals = []
+   for chem in chemFreq.keys():
+      if chemFreq[chem] >= poolThreshold:
+         enrichedChemicals.append(chem)
+   _chemHash[sequence] = set(enrichedChemicals)
+   for pool in currentPools:
+     if not len(_chemDict[pool] &  _chemHash[sequence]) > 0:
+        _resultHash[sequence] = _resultHash[sequence] - set(pool)	 
    if len(list(_resultHash[sequence])) < poolThreshold:
-         del _resultHash[sequence] 
+      del _resultHash[sequence]
+      del _chemHash[sequence]
 # print out results
 for sequence in _resultHash.keys():
    resultString = sequence # + ", mean="+str(_averageHash[sequence])
