@@ -1,0 +1,41 @@
+input: 
+    configFile //file indicating what chemicals are contained in each pool
+    directoryOfData //file path pointing to directory containing all deep sequencing files
+    enrichmentthreshold //ratio required between new pool and original to be considered enriched
+	majorityThreshold //in how many pools with the same chemical must a sequence enrich
+	poolthreshold //how many pools with the same chemical must a sequence enrich
+	
+parse configFile into: 
+    listChemical //list of chemicals used to treat the different pools
+	chemPoolDict //{key: pool, value: list of chemicals in each pool}
+for each file in directoryOfData:
+    parse sequences into:
+	    sequenceDict //{key: pool, value: list of sequences in each pool}
+//compute frequency ratio for each sequence
+for each pool:
+    for each sequence:
+	    compute ratio of sequence (occurencesOfSequence/totalNumberOfSequences)
+		store ratio in:
+		    ratioHash //{key: pool, value: dictionary{key:sequence, value: ratio}
+			
+//compare the frequency of a sequence in one pool to the frequency of that same sequence in every other pool
+for each pool:
+    for each sequence:
+        for each otherPool:
+            if ratio of sequence in pool is greater	than ratio in otherPool by factor of enrichmentRatio:
+			    numberOfPoolsBeat = numberOfPoolsBeat + 1
+	if numberOfPoolsBeat >= majorityThreshold: //then sequence is enriched
+	    store sequence in:
+		    potentialHitsDict //{key: sequence, value: pools where sequence enriched}
+
+//only retain sequences that were enriched in several pools containing the same chemical
+for each sequence in potentialHitsDict:
+    for each pool that sequence enriched:
+	   for each chemical in each pool:
+	       increment count for chemical, store in:
+		       enrichedChemicals //{key: chemical, value: countForChemical}
+	for each chemical in enrichedChemicals:
+	    if countForChemical >= poolThreshold
+		    store sequence in:
+			    hits //these are the enriched sequences that we are looking for
+return hits
