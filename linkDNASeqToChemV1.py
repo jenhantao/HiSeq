@@ -92,7 +92,6 @@ for sequence in _averageHash.keys():
 
 
 
-droppedSeqLog = open("droppedSequencesV2.txt", "w") # log dropped sequences
 # compare each pool to all of the other pools
 _resultHash = dict() # key is sequence value is set of pools that it enriches in
 for i in range(len(poolKeys)):
@@ -109,8 +108,6 @@ for i in range(len(poolKeys)):
             _resultHash[sequence] = _resultHash[sequence] | set(poolKeys[i]) # union is the only way I know to add to a set
          else:
             _resultHash[sequence] = set(poolKeys[i])
-      else:
-         droppedSeqLog.write(tokens[1]+"\n")
 
 # filter the result pools
 _chemHash = dict() # key is sequence, value is set containing enriching chemicals
