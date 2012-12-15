@@ -6,6 +6,12 @@
 import os
 import sys
 
+#sys.argv = ["","", "", "", "",""]
+#sys.argv[1] = "./testdata"
+#sys.argv[2] = 5
+#sys.argv[3] = 1
+#sys.argv[4] = 1
+#sys.argv[5] = "chempools.config"
 
 enrichmentThreshold = float(sys.argv[2]) #ratio required between new pool and original to be considered enriched
 path = sys.argv[1] # path to the data and output log files
@@ -131,7 +137,7 @@ for sequence in _resultHash.keys():
       del _chemHash[sequence]
 # print out results
 for sequence in _resultHash.keys():
-   resultString = sequence
+   resultString = sequence # + ", mean="+str(_averageHash[sequence])
    #chemicals that enrich are the intersection of the chemicals of the enriched pools
    chemicals = set()
    for pool in _resultHash[sequence]:
